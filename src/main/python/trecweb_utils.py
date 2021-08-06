@@ -13,7 +13,7 @@ def convert_to_jsonl(doc_id, passages):
     content = ''
 
     for passage in passages:
-        passage_dict = {'id': doc_id + '-' + passage['id'], 'contents': passage["body"].replace("\n"," ")}
+        passage_dict = {'id': str(doc_id) + '-' + str(passage['id']), 'contents': passage["body"].replace("\n"," ")}
         content += json.dumps(passage_dict)+'\n'
 
     return content
