@@ -6,7 +6,7 @@ import sys
 import os
 import codecs
 from tqdm import tqdm
-from trecweb_utils import convert_to_trecweb, add_passage_ids
+from trecweb_utils import convert_to_trecweb, add_passage_ids, convert_to_jsonl
 from passage_chunker import SpacyPassageChunker
 
 
@@ -98,10 +98,12 @@ def write_document(data, fp, dup_dict, passageChunker):
         passageChunker.sentence_tokenization(body)
         passages = passageChunker.create_passages()
 
-        passage_splits = add_passage_ids(passages)
+        # passage_splits = add_passage_ids(passages)
+        # trecweb_format = convert_to_trecweb(idx, title, passage_splits, url)
+        # fp.write(trecweb_format)
 
-        trecweb_format = convert_to_trecweb(idx, title, passage_splits, url)
-        fp.write(trecweb_format)
+        jsonl_format = convert_to_jsonl(idx, passages)
+        fp.write(jsonl_format)
         
 
     except:

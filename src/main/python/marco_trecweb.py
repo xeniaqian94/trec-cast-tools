@@ -3,7 +3,7 @@ import sys
 import os
 import io
 import codecs
-from trecweb_utils import convert_to_trecweb, add_passage_ids
+from trecweb_utils import convert_to_trecweb, add_passage_ids, convert_to_jsonl
 from passage_chunker import SpacyPassageChunker
 
 def parse_sim_file(filename):
@@ -53,10 +53,12 @@ def write_document(line, fp, sim_dict, passageChunker):
 
         passages = passageChunker.create_passages()
         
-        passage_splits = add_passage_ids(passages)
+        # passage_splits = add_passage_ids(passages)
+        # trecweb_format = convert_to_trecweb(idx, title, passage_splits, url)
+        # fp.write(trecweb_format)
 
-        trecweb_format = convert_to_trecweb(idx, title, passage_splits, url)
-        fp.write(trecweb_format)
+        jsonl_format = convert_to_jsonl(idx, passages)
+        fp.write(jsonl_format)
 
     except:
         #either idx, url, title, or body is missing

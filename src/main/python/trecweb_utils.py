@@ -1,5 +1,25 @@
+import json
+
+def convert_to_jsonl(doc_id, passages):
+    '''
+    This is the method to convert to jsonl format for passages,
+    = add_passage_ids() + convert_to_trecweb(), actually writes to JSONL format.
+    psg_id norm = 0-based
+
+    '''
+
+    passage_number = 0
+    passage_splits = ''
+    content = ''
+
+    for passage in passages:
+        passage_dict = {'id': doc_id + '-' + passage['id'], 'contents': passage["body"].replace("\n"," ")}
+        content += json.dumps(passage_dict)+'\n'
+
+    return content
+
+
 def convert_to_trecweb(passage_id, doc_title, doc_body, doc_url):
-    
     '''
     Takes a document with passage spilts and converts it to trecweb format
     '''
@@ -24,12 +44,11 @@ def convert_to_trecweb(passage_id, doc_title, doc_body, doc_url):
     content += '</HTML>\n'
     content += '</DOC>\n'
     content += '\n'
-    
+
     return content
 
 
 def add_passage_ids(passages):
-
     passage_number = 0
     passage_splits = ''
 
@@ -39,5 +58,4 @@ def add_passage_ids(passages):
         passage_splits += '</passage>\n'
         passage_number += 1
 
-    
     return passage_splits
