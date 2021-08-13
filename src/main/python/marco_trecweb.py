@@ -46,11 +46,11 @@ def write_document(line, fp, sim_dict, passageChunker, no_passage=False):
         if idx in sim_dict:
             return
 
+        idx = 'MARCO_' + str(idx)
+
         if no_passage:
             fp.write(convert_to_doc_jsonl(idx, url, title, body))
             return
-
-        idx = 'MARCO_' + str(idx)
 
         passageChunker.sentence_tokenization(body)
 
