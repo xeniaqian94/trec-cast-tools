@@ -1,4 +1,3 @@
-
 # Version 1.0
 # Python 3
 import json
@@ -6,7 +5,7 @@ import sys
 import os
 import codecs
 from tqdm import tqdm
-from trecweb_utils import convert_to_trecweb, add_passage_ids, convert_to_jsonl
+from trecweb_utils import convert_to_trecweb, add_passage_ids, convert_to_jsonl, convert_to_doc_jsonl
 from passage_chunker import SpacyPassageChunker
 
 
@@ -23,17 +22,17 @@ def get_document(data, dup_dict):
         str: Title of the WaPo document
         str: Url of the WaPo document
     """
-    
+
     if dup_dict.get(data["id"]) == 1:
         print("duplicate found -> {}!".format(data["id"]))
         return
-    
+
     if dup_dict.get(data["id"]) == 2:
         dup_dict[data["id"]] = 1
 
     idx = 'WAPO_' + str(data['id'])
     url = ''
-    
+
     if data["article_url"]:
         if "www.washingtonpost.com" not in data["article_url"]:
             url = "https://www.washingtonpost.com" + data['article_url']
@@ -41,22 +40,21 @@ def get_document(data, dup_dict):
             url = data['article_url']
     else:
         url = '/#'
-    
+
     body = ''
     contents = data['contents']
     title = 'No Title'
-    
+
     try:
         for item in contents:
             if 'subtype' in item and item['subtype'] == 'paragraph':
                 body += ' ' + item['content']
     except:
         body += 'No body'
-    
+
     if data['title'] != None:
         title = data['title'].replace("\n", " ")
 
-    
     return idx, body, title, url
 
 
@@ -72,16 +70,16 @@ def create_duplicate_dictionary(duplicate_file):
     dup_dict = {}
     data_dups = open(duplicate_file).readlines()
     for each in data_dups:
-        idxs = each.strip().split(' ') #source duplicate title
+        idxs = each.strip().split(' ')  # source duplicate title
         if idxs[0] == idxs[1]:
-            dup_dict[idxs[1]] = 2 #the duplicate has the same id as the original
+            dup_dict[idxs[1]] = 2  # the duplicate has the same id as the original
         else:
-            dup_dict[idxs[1]] = 1 #the duplicate has a different id from the original
-    
+            dup_dict[idxs[1]] = 1  # the duplicate has a different id from the original
+
     return dup_dict
 
 
-def write_document(data, fp, dup_dict, passageChunker):
+def write_document(data, fp, dup_dict, passageChunker, no_passage=False):
     """Writes a WaPo document to trecweb
 
     Args:
@@ -95,6 +93,10 @@ def write_document(data, fp, dup_dict, passageChunker):
     try:
         idx, body, title, url = get_document(data1, dup_dict)
 
+        if no_passage:
+            fp.write(convert_to_doc_jsonl(idx, url, title, body))
+            return
+
         passageChunker.sentence_tokenization(body)
         passages = passageChunker.create_passages()
 
@@ -104,32 +106,30 @@ def write_document(data, fp, dup_dict, passageChunker):
 
         jsonl_format = convert_to_jsonl(idx, passages)
         fp.write(jsonl_format)
-        
+
 
     except:
         return
 
-    
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
-        print("Usage: python3 wapo_trecweb.py DATAPATH DUMP_PATH DUPLICATE_FILE")
+        print("Usage: python3 wapo_trecweb.py DATAPATH DUMP_PATH DUPLICATE_FILE [no_passage]")
         print("Example: python wapo_clean_parser.py ../wapo_path ../wapo_dump_dir wapo-near-duplicates")
         exit(0)
 
-
     duplicate_file = sys.argv[3]
-    dumper = sys.argv[2] 
+    dumper = sys.argv[2]
     file_path = sys.argv[1]
-
+    no_passage = True if len(sys.argv) == 5 else False
 
     dup_dict = create_duplicate_dictionary(duplicate_file)
-    
+
     input_file = os.path.basename(file_path)
 
     if not os.path.exists(dumper):
         os.mkdir(dumper)
-    
+
     dumper_file = os.path.join(dumper, input_file + '.trecweb')
     fp = codecs.open(dumper_file, 'w', 'utf-8')
     print("Opening ", file_path)
@@ -139,8 +139,7 @@ if __name__ == '__main__':
 
     passageChunker = SpacyPassageChunker()
 
-
     for i, data in tqdm(enumerate(lines), total=tl):
-        write_document(data, fp, dup_dict, passageChunker)        
-        
+        write_document(data, fp, dup_dict, passageChunker, no_passage=no_passage)
+
     fp.close()

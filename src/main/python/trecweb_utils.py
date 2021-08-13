@@ -1,5 +1,6 @@
 import json
 
+
 def convert_to_jsonl(doc_id, passages):
     '''
     This is the method to convert to jsonl format for passages,
@@ -13,9 +14,19 @@ def convert_to_jsonl(doc_id, passages):
     content = ''
 
     for passage in passages:
-        passage_dict = {'id': str(doc_id) + '-' + str(passage['id']), 'contents': passage["body"].replace("\n"," ")}
-        content += json.dumps(passage_dict)+'\n'
+        passage_dict = {'id': str(doc_id) + '-' + str(passage['id']), 'contents': passage["body"].replace("\n", " ")}
+        content += json.dumps(passage_dict) + '\n'
 
+    return content
+
+
+def convert_to_doc_jsonl(idx, url, title, body, augmented=True):
+    if augmented:
+        doc_dict = {'id': str(idx),
+                    'contents': url.replace("\n", " ") + " " + title.replace("\n", " ") + " " + body.replace("\n", " ")}
+    else:
+        doc_dict = {'id': str(idx), 'contents': body.replace("\n", " ")}
+    content = json.dumps(doc_dict) + "\n"
     return content
 
 
