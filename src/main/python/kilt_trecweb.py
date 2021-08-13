@@ -3,7 +3,7 @@ from tqdm import tqdm
 import os
 import sys
 import codecs
-from trecweb_utils import convert_to_trecweb, add_passage_ids, convert_to_jsonl
+from trecweb_utils import convert_to_trecweb, add_passage_ids, convert_to_jsonl, convert_to_doc_jsonl
 from passage_chunker import SpacyPassageChunker
 
 
