@@ -42,12 +42,12 @@ def write_document(line, fp, sim_dict, passageChunker, no_passage=False):
     try:
         idx, url, title, body = line.strip().split('\t')
 
-        if no_passage:
-            fp.write(convert_to_doc_jsonl(idx, url, title, body))
-            return
-
         # if the id is a duplicate, don't add it
         if idx in sim_dict:
+            return
+
+        if no_passage:
+            fp.write(convert_to_doc_jsonl(idx, url, title, body))
             return
 
         idx = 'MARCO_' + str(idx)
@@ -78,6 +78,7 @@ if __name__ == "__main__":
     dump_dir = sys.argv[2]
     sim_file = sys.argv[3]
     no_passage = True if len(sys.argv) == 5 else False
+    print("no passage", no_passage)
 
     # Create the directory (for dumping files) if it doesn't exists
     if not os.path.exists(dump_dir):
