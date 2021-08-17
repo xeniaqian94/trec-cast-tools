@@ -93,11 +93,13 @@ def write_document(data, fp, dup_dict, passageChunker, no_passage=False):
     try:
         idx, body, title, url = get_document(data1, dup_dict)
 
+        passageChunker.sentence_tokenization(body)
+
         if no_passage:
-            fp.write(convert_to_doc_jsonl(idx, url, title, body))
+            sanitized_body = passageChunker.create_sanitized_doc()
+            fp.write(convert_to_doc_jsonl(idx, url, title, sanitized_body))
             return
 
-        passageChunker.sentence_tokenization(body)
         passages = passageChunker.create_passages()
 
         # passage_splits = add_passage_ids(passages)

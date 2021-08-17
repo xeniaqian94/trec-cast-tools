@@ -17,7 +17,7 @@ def convert_to_jsonl(doc_id, passages, url=None, title=None):
     #     passage_dict = {'id': str(doc_id) + '-' + str(passage['id']), 'contents': passage["body"].replace("\n", " ")}
     #     content += json.dumps(passage_dict) + '\n'
 
-    ## create json str for dense doc index
+    ## create json str for dense doc index. Format see https://github.com/castorini/pyserini/blob/master/docs/experiments-tct_colbert-v2.md
     for passage in passages:
         passage_dict = {"id": str(doc_id) + "#" + str(passage['id']), 'contents': url+"\n"+title+"\n"+passage["body"].replace("\n", " ")}
         content += json.dumps(passage_dict) + '\n'
