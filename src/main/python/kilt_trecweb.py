@@ -32,7 +32,7 @@ def write_document(line, fp, passageChunker, no_passage=False):
     # trecweb_format = convert_to_trecweb(idx, title, passage_splits, url)
     # fp.write(trecweb_format)
 
-    jsonl_format = convert_to_jsonl(idx, passages)
+    jsonl_format = convert_to_jsonl(idx, passages, url=url, title=title)
     fp.write(jsonl_format)
 
 

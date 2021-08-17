@@ -1,7 +1,7 @@
 import json
 
 
-def convert_to_jsonl(doc_id, passages):
+def convert_to_jsonl(doc_id, passages, url=None, title=None):
     '''
     This is the method to convert to jsonl format for passages,
     = add_passage_ids() + convert_to_trecweb(), actually writes to JSONL format.
@@ -13,9 +13,15 @@ def convert_to_jsonl(doc_id, passages):
     passage_splits = ''
     content = ''
 
+    # for passage in passages:
+    #     passage_dict = {'id': str(doc_id) + '-' + str(passage['id']), 'contents': passage["body"].replace("\n", " ")}
+    #     content += json.dumps(passage_dict) + '\n'
+
+    ## create json str for dense doc index
     for passage in passages:
-        passage_dict = {'id': str(doc_id) + '-' + str(passage['id']), 'contents': passage["body"].replace("\n", " ")}
+        passage_dict = {"id": str(doc_id) + "#" + str(passage['id']), 'contents': url+"\n"+title+"\n"+passage["body"].replace("\n", " ")}
         content += json.dumps(passage_dict) + '\n'
+
 
     return content
 
