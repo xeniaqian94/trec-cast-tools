@@ -38,18 +38,31 @@ The resulting material commonly finds use as a diamond imitation or simulant. Co
 ## How to use
 
 1. `cd` into `src/main/python`
-1. Create and Activate a Python Virtual Environment using `python3 -m venv env` then `source env/bin/activate` (for my case, `cd /fs/clip-quiz/xinq/trec-cast-tools/src/main/python/` then conda deactivate (base))
+1. Create and Activate a Python Virtual Environment using `python3 -m venv env` then `source env/bin/activate` 
+(for my case, `cd /fs/clip-quiz/xinq/trec-cast-tools/src/main/python/` then `source trec-cast-tool/bin/activate` then `conda deactivate` (base))
 2. Install the dependencies using `pip install -r requirements.txt`
 
 ### Creating the Trecweb scripts:
 
-Ensure you have a copy of the Marco document, KILT, and WaPo collections and any relevant duplicate files (duplicates file for Marco and WaPo can be found in [this folder](https://github.com/daltonj/treccastweb/tree/master/2021/duplicate_files)). Then:
+Ensure you have a copy of the Marco document, KILT, and WaPo collections and any relevant duplicate files (duplicates file for Marco and WaPo can be found in [this folder](https://github.com/daltonj/treccastweb/tree/master/2021/duplicate_files)). 
+
+    cd /fs/clip-scratch/xinq/treccast/duplicates/
+    wget https://raw.githubusercontent.com/daltonj/treccastweb/master/2021/duplicate_files/marco_duplicates.txt 
+    wget https://raw.githubusercontent.com/daltonj/treccastweb/master/2021/duplicate_files/wapo-near-duplicates
+
+
+Then:
+
+create three json repo:
+    /fs/clip-scratch/xinq/treccast/data_jsonl/ (passage data)
+    /fs/clip-scratch/xinq/treccast/doc_data_jsonl_sanitized/ (doc data)
+    /fs/clip-scratch/xinq/treccast/doc_dense_jsonl/ (passage/doc dense retrieval)
 
 To generate the **trecweb file for the Marco document collection**, run (takes about 4 hours):
 
 `python marco_trecweb.py path-to-msmarco-docs.tsv path-to-dump-directory path-to-duplicates-file`
 (passage jsonl)`python marco_trecweb.py /fs/clip-scratch/xinq/treccast/data/msmarco-docs.tsv /fs/clip-scratch/xinq/treccast/data_jsonl/msmarco /fs/clip-scratch/xinq/treccast/duplicates/marco_duplicates.txt`
-(doc Dense jsonl) `python marco_trecweb.py /fs/clip-scratch/xinq/treccast/data/msmarco-docs.tsv /fs/clip-scratch/xinq/treccast/doc_dense_jsonl/ /fs/clip-scratch/xinq/treccast/duplicates/marco_duplicates.txt` screen 25654.pts-32.clipsub00
+(code status in `trecweb_utils.py`, will get doc Dense jsonl) `python marco_trecweb.py /fs/clip-scratch/xinq/treccast/data/msmarco-docs.tsv /fs/clip-scratch/xinq/treccast/doc_dense_jsonl/ /fs/clip-scratch/xinq/treccast/duplicates/marco_duplicates.txt` screen 25654.pts-32.clipsub00
 (doc jsonl) `python marco_trecweb.py /fs/clip-scratch/xinq/treccast/data/msmarco-docs.tsv /fs/clip-scratch/xinq/treccast/doc_data_jsonl/ /fs/clip-scratch/xinq/treccast/duplicates/marco_duplicates.txt no_passage`
 
 
@@ -67,14 +80,15 @@ To generate the **trecweb file for WaPo**, run (takes about 1 hour):
 (passage jsonl) `python wapo_trecweb.py /fs/clip-scratch/xinq/treccast/data/WashingtonPost.v4/data/TREC_Washington_Post_collection.v4.jl  /fs/clip-scratch/xinq/treccast/data_jsonl/wapo  /fs/clip-scratch/xinq/treccast/duplicates/wapo-near-duplicates`
 (doc dense jsonl) `python wapo_trecweb.py /fs/clip-scratch/xinq/treccast/data/WashingtonPost.v4/data/TREC_Washington_Post_collection.v4.jl  /fs/clip-scratch/xinq/treccast/doc_dense_jsonl/  /fs/clip-scratch/xinq/treccast/duplicates/wapo-near-duplicates` screen 26290.pts-32.clipsub00
 (doc jsonl) `python wapo_trecweb.py /fs/clip-scratch/xinq/treccast/data/WashingtonPost.v4/data/TREC_Washington_Post_collection.v4.jl  /fs/clip-scratch/xinq/treccast/doc_data_jsonl/ /fs/clip-scratch/xinq/treccast/duplicates/wapo-near-duplicates no_passage` => need to re-run bc html tag 
-(doc jsonl) `python wapo_trecweb.py /fs/clip-scratch/xinq/treccast/data/WashingtonPost.v4/data/TREC_Washington_Post_collection.v4.jl  /fs/clip-scratch/xinq/treccast/doc_data_jsonl_sanitized/ /fs/clip-scratch/xinq/treccast/duplicates/wapo-near-duplicates no_passage` => need to re-run bc html tag 
+(doc jsonl) `python wapo_trecweb.py /fs/clip-scratch/xinq/treccast/data/WashingtonPost.v4/data/TREC_Washington_Post_collection.v4.jl  /fs/clip-scratch/xinq/treccast/doc_data_jsonl_sanitized/ /fs/clip-scratch/xinq/treccast/duplicates/wapo-near-duplicates no_passage` 
 
 Generating document files from original scripts, for indexing 
 
    then run 
-   
+    /fs/clip-quiz/xinq/chatty-goose/experiments/create_index.sh
     /fs/clip-quiz/xinq/chatty-goose/experiments/create_index_doc.sh
     /fs/clip-quiz/xinq/chatty-goose/experiments/create_index_doc_sanitized.sh
+    (dense retrieval don't have this step) 
      
 
 python
